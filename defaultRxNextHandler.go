@@ -17,7 +17,7 @@ type DefaultRxNextHandler struct {
 	e      rxgo.ErrFunc
 	c      rxgo.CompletedFunc
 	t      TryNextFunc
-	active func() bool
+	active IsNextActive
 }
 
 func NewDefaultRxNextHandler(
@@ -25,7 +25,7 @@ func NewDefaultRxNextHandler(
 	t TryNextFunc,
 	e rxgo.ErrFunc,
 	c rxgo.CompletedFunc,
-	active func() bool,
+	active IsNextActive,
 ) *DefaultRxNextHandler {
 	return &DefaultRxNextHandler{
 		i: func(i rxgo.NextFunc) rxgo.NextFunc {
