@@ -30,7 +30,9 @@ func ProvideCancelContextWithRwc(cancelContext context.Context) fx.Option {
 					},
 				)
 				return ctx,
-					cancellationContextInstance.Cancel,
+					func() {
+						cancellationContextInstance.Cancel()
+					},
 					cancellationContextInstance,
 					nil
 			},
