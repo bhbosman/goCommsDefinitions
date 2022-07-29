@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"io"
+	"sync"
 )
 
 type ICancellationContext interface {
@@ -14,6 +15,7 @@ type ICancellationContext interface {
 }
 
 type cancellationContext struct {
+	mutex         sync.Mutex
 	cancelFunc    context.CancelFunc
 	cancelContext context.Context
 	logger        *zap.Logger
@@ -27,6 +29,9 @@ func (self *cancellationContext) CancelWithError(err error) {
 }
 
 func (self *cancellationContext) Add(f func()) error {
+	self.mutex.Lock()
+	defer self.mutex.Unlock()
+	//
 	self.f = append(self.f, f)
 	return nil
 }
