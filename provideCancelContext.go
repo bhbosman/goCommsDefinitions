@@ -28,7 +28,9 @@ func ProvideCancelContext(cancelContext context.Context) fx.Option {
 					},
 				)
 				return ctx,
-					cancellationContext.Cancel,
+					func() {
+						cancellationContext.Cancel()
+					},
 					cancellationContext,
 					nil
 			},
