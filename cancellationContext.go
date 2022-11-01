@@ -9,7 +9,7 @@ import (
 )
 
 type ICancellationContext interface {
-	Add(connectionId string, f func()) error
+	Add(connectionId string, f func()) (bool, error)
 	Remove(connectionId string) error
 	Cancel()
 	CancelWithError(err error)
@@ -38,17 +38,19 @@ func (self *cancellationContext) CancelWithError(err error) {
 	self.Cancel()
 }
 
-func (self *cancellationContext) Add(connectionId string, f func()) error {
+func (self *cancellationContext) Add(connectionId string, f func()) (bool, error) {
 	if !self.cancelCalled {
 		self.mutex.Lock()
 		defer self.mutex.Unlock()
 		//
-		if f, ok := self.f[connectionId]; ok {
-			f()
+		if foundFunction, ok := self.f[connectionId]; ok {
+			foundFunction()
 		}
 		self.f[connectionId] = f
+		return true, nil
 	}
-	return nil
+	f()
+	return false, nil
 }
 
 func (self *cancellationContext) CancelContext() context.Context {
