@@ -26,7 +26,12 @@ func NewDefaultRxNextHandler(
 	e rxgo.ErrFunc,
 	c rxgo.CompletedFunc,
 	active IsNextActive,
-) *DefaultRxNextHandler {
+) (*DefaultRxNextHandler, error) {
+	// todo: clean up required. check for invalid params and then clean up all callbacks
+
+	if i == nil || t == nil {
+
+	}
 	return &DefaultRxNextHandler{
 		i: func(i rxgo.NextFunc) rxgo.NextFunc {
 			if i != nil {
@@ -54,7 +59,7 @@ func NewDefaultRxNextHandler(
 				return true
 			}
 		}(active),
-	}
+	}, nil
 }
 
 func (self *DefaultRxNextHandler) OnSendData(i interface{}) {
