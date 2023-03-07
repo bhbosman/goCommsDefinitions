@@ -13,13 +13,13 @@ func ProvideCancelContextWithRwc(cancelContext context.Context) fx.Option {
 			Target: func(
 				params struct {
 					fx.In
-					Lifecycle fx.Lifecycle
-					Logger    *zap.Logger
-					Rwc       io.ReadWriteCloser `name:"PrimaryConnection"`
+					Lifecycle               fx.Lifecycle
+					Logger                  *zap.Logger
+					PrimaryConnectionCloser io.Closer `name:"PrimaryConnection"`
 				},
 			) (context.Context, context.CancelFunc, ICancellationContext, error) {
 				ctx, cancelFunc := context.WithCancel(cancelContext)
-				cancellationContextInstance := newCancellationContext(cancelFunc, ctx, params.Logger, params.Rwc)
+				cancellationContextInstance := newCancellationContext(cancelFunc, ctx, params.Logger, params.PrimaryConnectionCloser)
 				params.Lifecycle.Append(
 					fx.Hook{
 						OnStart: nil,
