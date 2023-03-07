@@ -15,7 +15,7 @@ func ProvideCancelContextWithRwc(cancelContext context.Context) fx.Option {
 					fx.In
 					Lifecycle               fx.Lifecycle
 					Logger                  *zap.Logger
-					PrimaryConnectionCloser io.Closer `name:"PrimaryConnection"`
+					PrimaryConnectionCloser io.Closer //`name:"PrimaryConnection"`
 				},
 			) (context.Context, context.CancelFunc, ICancellationContext, error) {
 				ctx, cancelFunc := context.WithCancel(cancelContext)
