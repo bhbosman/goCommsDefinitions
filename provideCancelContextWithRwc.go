@@ -19,7 +19,12 @@ func ProvideCancelContextWithRwc(cancelContext context.Context) fx.Option {
 				},
 			) (context.Context, context.CancelFunc, ICancellationContext, error) {
 				ctx, cancelFunc := context.WithCancel(cancelContext)
-				cancellationContextInstance := newCancellationContext(cancelFunc, ctx, params.Logger, params.PrimaryConnectionCloser)
+				cancellationContextInstance := newCancellationContext(
+					cancelFunc,
+					ctx,
+					params.Logger,
+					params.PrimaryConnectionCloser,
+				)
 				params.Lifecycle.Append(
 					fx.Hook{
 						OnStart: nil,
@@ -30,9 +35,7 @@ func ProvideCancelContextWithRwc(cancelContext context.Context) fx.Option {
 					},
 				)
 				return ctx,
-					func() {
-						cancellationContextInstance.Cancel()
-					},
+					cancellationContextInstance.Cancel,
 					cancellationContextInstance,
 					nil
 			},
