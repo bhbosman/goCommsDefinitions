@@ -82,12 +82,12 @@ func (self *cancellationContext) Cancel() {
 	}
 }
 
-func newCancellationContext(
+func NewCancellationContext(
 	cancelFunc context.CancelFunc,
 	cancelContext context.Context,
 	logger *zap.Logger,
 	closer io.Closer,
-) *cancellationContext {
+) ICancellationContext {
 	return &cancellationContext{
 		cancelFunc:    cancelFunc,
 		cancelContext: cancelContext,
