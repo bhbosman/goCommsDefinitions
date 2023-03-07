@@ -82,7 +82,7 @@ func (self *cancellationContext) Cancel() {
 	}
 }
 
-func NewCancellationContext(
+func newCancellationContext(
 	cancelFunc context.CancelFunc,
 	cancelContext context.Context,
 	logger *zap.Logger,
