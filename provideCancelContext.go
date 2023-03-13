@@ -4,8 +4,30 @@ import (
 	"context"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
+	"net"
 )
 
+func InvokeListenerClose() fx.Option {
+	fx.Invoke(
+		func(
+			params struct {
+				fx.In
+				NetListener net.Listener
+				Lifecycle   fx.Lifecycle
+			},
+		) {
+			params.Lifecycle.Append(
+				fx.Hook{
+					OnStart: nil,
+					OnStop: func(ctx context.Context) error {
+						err := params.NetListener.Close()
+						return err
+					},
+				},
+			)
+		},
+	)
+}
 func InvokeCancelContext() fx.Option {
 	return fx.Invoke(
 		func(
