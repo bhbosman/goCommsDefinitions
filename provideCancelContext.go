@@ -8,7 +8,7 @@ import (
 )
 
 func InvokeListenerClose() fx.Option {
-	fx.Invoke(
+	return fx.Invoke(
 		func(
 			params struct {
 				fx.In
@@ -28,6 +28,7 @@ func InvokeListenerClose() fx.Option {
 		},
 	)
 }
+
 func InvokeCancelContext() fx.Option {
 	return fx.Invoke(
 		func(
