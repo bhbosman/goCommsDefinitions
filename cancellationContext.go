@@ -23,6 +23,7 @@ type cancellationContext struct {
 	f             map[string]func(ICancellationContext)
 	cancelCalled  bool
 	closer        io.Closer
+	name          string
 }
 
 func (self *cancellationContext) Remove(connectionId string) error {
@@ -62,8 +63,11 @@ func (self *cancellationContext) CancelFunc() context.CancelFunc {
 }
 
 func (self *cancellationContext) Cancel() {
-	if !self.cancelCalled {
-		self.cancelCalled = true
+	self.mutex.Lock()
+	b := self.cancelCalled
+	self.cancelCalled = true
+	self.mutex.Unlock()
+	if !b {
 		self.logger.Info(fmt.Sprintf("Cancel func for connection called"))
 		self.cancelFunc()
 		if self.closer != nil {
@@ -83,12 +87,14 @@ func (self *cancellationContext) Cancel() {
 }
 
 func NewCancellationContext(
+	name string,
 	cancelFunc context.CancelFunc,
 	cancelContext context.Context,
 	logger *zap.Logger,
 	closer io.Closer,
 ) ICancellationContext {
 	return &cancellationContext{
+		name:          name,
 		cancelFunc:    cancelFunc,
 		cancelContext: cancelContext,
 		logger:        logger,

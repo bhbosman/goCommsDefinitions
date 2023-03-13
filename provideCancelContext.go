@@ -6,33 +6,41 @@ import (
 	"go.uber.org/zap"
 )
 
+func InvokeCancelContext() fx.Option {
+	return fx.Invoke(
+		func(
+			params struct {
+				fx.In
+				Lifecycle           fx.Lifecycle
+				CancellationContext ICancellationContext
+			},
+		) error {
+			params.Lifecycle.Append(
+				fx.Hook{
+					OnStart: nil,
+					OnStop: func(ctx context.Context) error {
+						params.CancellationContext.Cancel()
+						return nil
+					},
+				},
+			)
+			return nil
+		},
+	)
+}
 func ProvideCancelContext(cancelContext context.Context) fx.Option {
 	return fx.Provide(
 		fx.Annotated{
 			Target: func(
 				params struct {
 					fx.In
-					Lifecycle fx.Lifecycle
-					Logger    *zap.Logger
+					Logger         *zap.Logger
+					ConnectionName string `name:"ConnectionName"`
 				},
 			) (context.Context, context.CancelFunc, ICancellationContext, error) {
 				ctx, cancelFunc := context.WithCancel(cancelContext)
-				cancellationContext := NewCancellationContext(cancelFunc, ctx, params.Logger, nil)
-				params.Lifecycle.Append(
-					fx.Hook{
-						OnStart: nil,
-						OnStop: func(ctx context.Context) error {
-							cancellationContext.Cancel()
-							return nil
-						},
-					},
-				)
-				return ctx,
-					func() {
-						cancellationContext.Cancel()
-					},
-					cancellationContext,
-					nil
+				cancelInstance := NewCancellationContext(params.ConnectionName, cancelFunc, ctx, params.Logger, nil)
+				return ctx, cancelInstance.Cancel, cancelInstance, nil
 			},
 		},
 	)
