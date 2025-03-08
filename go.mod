@@ -25,5 +25,3 @@ require (
 	golang.org/x/sys v0.31.0 // indirect
 )
 
-//replace github.com/golang/mock => github.com/bhbosman/gomock v1.6.1-0.20230302060806-d02c40b7514e
-//
